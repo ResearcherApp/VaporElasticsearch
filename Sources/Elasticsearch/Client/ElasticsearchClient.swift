@@ -93,7 +93,9 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
         with body: Dictionary<String, Any>
     ) -> Future<Data?> {
         do {
+          print("getting jsonData: ...")
             let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+          print("got jsonData: \(jsonData.debugDescription)")
             return send(method, to: path, with: jsonData)
         } catch {
             return worker.future(error: error)
@@ -105,7 +107,9 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
         to path: String,
         with body: Data
     ) -> Future<Data?> {
+        print("building httpReq: ...")
         let httpReq = HTTPRequest(method: method, url: path, body: HTTPBody(data: body))
+      print("built httpReq: \(httpReq.debugDescription)")
         return send(httpReq)
     }
     
@@ -113,19 +117,25 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
         _ request: HTTPRequest
     ) -> Future<Data?> {
         var request = request
+      print("building request(1): \(request.debugDescription)")
         if request.headers.contains(name: "Content-Type") == false {
             request.headers.add(name: "Content-Type", value: "application/json")
         }
+        print("building request(2): \(request.debugDescription)")
         if self.config.username != nil && self.config.password != nil {
             let token = "\(config.username!):\(config.password!)".data(using: String.Encoding.utf8)?.base64EncodedString()
             if token != nil {
                 request.headers.add(name: "Authorization", value: "Basic \(token!)")
             }
         }
+      print("building request(3): \(request.debugDescription)")
 
         logger?.record(query: request.description)
         
         return self.esConnection.send(request).map(to: Data?.self) { response in
+          print("response: \(response.debugDescription)")
+          print("response code: \(response.status.code)")
+
             if response.body.data == nil {
                 throw ElasticsearchError(identifier: "empty_response", reason: "Missing response body from Elasticsearch", source: .capture())
             }

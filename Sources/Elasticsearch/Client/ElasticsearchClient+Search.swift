@@ -25,9 +25,9 @@ extension ElasticsearchClient {
             return worker.future(error: error)
         }
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_search", routing: routing)
-      print("sending: \(url)")
+      print("sending: \(url.debugDescription)")
         return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
-          print("sent: \(url)")
+          print("sent: \(url.debugDescription)")
 
             let decoder = JSONDecoder()
             if let aggregations = query.aggs {
