@@ -21,8 +21,6 @@ public struct BulkHeader: Encodable {
     public var index: String?
     /// The document id
     public var id: String?
-    /// The ElasticSearch type (defaults to "_doc")
-    public var type: String?
     /// Routing information
     public var routing: String?
     /// Document version
@@ -33,7 +31,6 @@ public struct BulkHeader: Encodable {
     enum CodingKeys: String, CodingKey {
         case index = "_index"
         case id = "_id"
-        case type = "_type"
         case routing = "_routing"
         case version = "_version"
         case retryOnConflict = "retry_on_conflict"
@@ -52,7 +49,7 @@ public class ElasticsearchBulk {
     ///
     /// This is useful in cases where all (or the majority) of the opeations you perform should be performed on the same index, type, etc.
     /// If values are provided in the operation calls (`index`, `create`, `update`, `delete`) those values override the values provided here.
-    public var defaultHeader: BulkHeader = BulkHeader(index: nil, id: nil, type: "_doc", routing: nil, version: nil, retryOnConflict: nil)
+    public var defaultHeader: BulkHeader = BulkHeader(index: nil, id: nil, routing: nil, version: nil, retryOnConflict: nil)
 
     /// Creates a new bulk operation object.
     ///
@@ -70,7 +67,6 @@ public class ElasticsearchBulk {
     ///   - doc: The document to be indexed
     ///   - index: The index to put the document into
     ///   - id: The id to use for the document
-    ///   - type: The document type
     ///   - routing: Routing information
     ///   - version: Version information
     /// - Throws: Can throw errors if there are issues encoding the doc.
@@ -78,11 +74,10 @@ public class ElasticsearchBulk {
         doc :T,
         index: String? = nil,
         id: String? = nil,
-        type: String? = nil,
         routing: String? = nil,
         version: Int? = nil
         ) throws {
-        let header = ["index": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, type: type, routing: routing, version: version, retryOnConflict: nil))]
+        let header = ["index": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: nil))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
@@ -98,7 +93,6 @@ public class ElasticsearchBulk {
     ///   - doc: The document to be created
     ///   - index: The index to put the document into
     ///   - id: The id to use for the document
-    ///   - type: The document type
     ///   - routing: Routing information
     ///   - version: Version information
     /// - Throws: Can throw errors if there are issues encoding the doc.
@@ -106,11 +100,10 @@ public class ElasticsearchBulk {
         doc :T,
         index: String? = nil,
         id: String? = nil,
-        type: String? = nil,
         routing: String? = nil,
         version: Int? = nil
         ) throws {
-        let header = ["create": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, type: type, routing: routing, version: version, retryOnConflict: nil))]
+        let header = ["create": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: nil))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
@@ -126,7 +119,6 @@ public class ElasticsearchBulk {
     ///   - doc: The document to be updated
     ///   - index: The index to put the document into
     ///   - id: The id to use for the document
-    ///   - type: The document type
     ///   - routing: Routing information
     ///   - version: Version information
     /// - Throws: Can throw errors if there are issues encoding the doc.
@@ -134,12 +126,11 @@ public class ElasticsearchBulk {
         doc :T,
         index: String? = nil,
         id: String? = nil,
-        type: String? = nil,
         routing: String? = nil,
         version: Int? = nil,
         retryOnConflict: Int? = nil
         ) throws {
-        let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, type: type, routing: routing, version: version, retryOnConflict: retryOnConflict))]
+        let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
@@ -155,18 +146,16 @@ public class ElasticsearchBulk {
     /// - Parameters:
     ///   - id: The id of the document to be deleted
     ///   - index: The index where the document is located at
-    ///   - type: The document type
     ///   - routing: Routing information
     ///   - version: Version information
     /// - Throws: Can throw errors if there are issues encoding the doc.
     public func delete(
         id: String? = nil,
         index: String? = nil,
-        type: String? = nil,
         routing: String? = nil,
         version: Int? = nil
         ) throws {
-        let header = ["delete": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, type: type, routing: routing, version: version, retryOnConflict: nil))]
+        let header = ["delete": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: nil))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
@@ -195,7 +184,6 @@ public class ElasticsearchBulk {
     private func mergeHeaders(_ base: BulkHeader, _ override: BulkHeader) -> BulkHeader {
         return BulkHeader(index: override.index ?? base.index,
                           id: override.id ?? base.id,
-                          type: override.type ?? base.type,
                           routing: override.routing ?? base.routing,
                           version: override.version ?? base.version,
                           retryOnConflict: override.retryOnConflict ?? base.retryOnConflict)

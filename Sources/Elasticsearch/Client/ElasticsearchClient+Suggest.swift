@@ -9,13 +9,11 @@ extension ElasticsearchClient {
     /// - Parameters:
     ///   - index: The index to execute the query against
     ///   - query: A SearchContainer object that specifies the query to execute
-    ///   - type: The index type (defaults to _doc)
     ///   - routing: Routing information
     /// - Returns: A Future SearchResponse
     public func suggest(
         index: String,
         query: SuggestContainer,
-        type: String = "_doc",
         routing: String? = nil
     ) -> Future<SuggestResponse> {
         let body: Data
@@ -24,7 +22,7 @@ extension ElasticsearchClient {
         } catch {
             return worker.future(error: error)
         }
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(type)/_search", routing: routing)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_search", routing: routing)
 
         return send(HTTPMethod.POST, to: url.string!, with: body).map { jsonData in
             let decoder = JSONDecoder()
