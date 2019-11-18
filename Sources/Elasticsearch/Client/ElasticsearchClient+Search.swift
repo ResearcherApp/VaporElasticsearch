@@ -26,6 +26,7 @@ extension ElasticsearchClient {
         }
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_search", routing: routing)
         return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
+          
             let decoder = JSONDecoder()
             if let aggregations = query.aggs {
                 if aggregations.count > 0 {
@@ -34,8 +35,16 @@ extension ElasticsearchClient {
             }
             
             if let jsonData = jsonData {
-                return try decoder.decode(SearchResponse<U>.self, from: jsonData)
+                print("jsonData: \(jsonData)")
+              let decoded = try decoder.decode(SearchResponse<U>.self, from: jsonData)
+              
+              print("decoded: \(decoded)")
+              
+              return decoded
             }
+            else {
+              print("jsonData: -")
+          }
             
             throw ElasticsearchError(identifier: "search_failed", reason: "Could not execute search", source: .capture(), statusCode: 404)
         }
