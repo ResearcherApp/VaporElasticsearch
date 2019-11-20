@@ -29,15 +29,23 @@ public struct ElasticsearchClientConfig: Service {
 
     /// Create a new `ElasticsearchClientConfig` from a URL
     public init(url: URL) {
-        self.hostname = url.host ?? "localhost"
-        self.port = url.port ?? 9200
-        self.username = url.user
-        self.password = url.password
+      self.hostname = url.host ?? "localhost"
+      self.port = url.port ?? 9200
+      self.username = url.user
+      self.password = url.password
+      self.useSSL = url.scheme == "https"
     }
     
     /// Create a new `ElasticsearchClientConfig`
-    public init(hostname: String = "localhost", port: Int = 9200) {
-        self.hostname = hostname
-        self.port = port
+    public init(hostname: String = "localhost",
+                port: Int = 9200,
+                username: String? = nil,
+                password: String? = nil,
+                useSSL: Bool = false) {
+      self.hostname = hostname
+      self.port = port
+      self.username = username
+      self.password = password
+      self.useSSL = useSSL
     }
 }
