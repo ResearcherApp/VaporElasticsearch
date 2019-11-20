@@ -10,6 +10,7 @@ public struct SearchContainer: Encodable {
     public let from: Int
     public let size: Int
     public let terminateAfter: Int?
+  public let fields: [String]?
 
     enum CodingKeys: String, CodingKey {
         case query
@@ -18,6 +19,7 @@ public struct SearchContainer: Encodable {
         case from
         case size
         case terminateAfter = "terminate_after"
+      case fields = "_source"
     }
 
     public init(aggs: [Aggregation]) {
@@ -30,9 +32,10 @@ public struct SearchContainer: Encodable {
         aggs: [Aggregation]? = nil,
         from: Int = 0,
         size: Int = 10,
-        terminateAfter: Int? = nil
+        terminateAfter: Int? = nil,
+      fields: [String]? = nil
     ) {
-        self.init(query: query, sort: sort, aggs: aggs, from: from, size: size)
+      self.init(query: query, sort: sort, aggs: aggs, from: from, size: size, terminateAfter: terminateAfter, fields: fields)
     }
 
     private init(
@@ -41,7 +44,8 @@ public struct SearchContainer: Encodable {
         aggs: [Aggregation]? = nil,
         from: Int = 0,
         size: Int = 10,
-        terminateAfter: Int? = nil
+        terminateAfter: Int? = nil,
+        fields: [String]? = nil
     ) {
         self.query = query
         self.sort = sort
@@ -49,6 +53,7 @@ public struct SearchContainer: Encodable {
         self.from = from
         self.size = query == nil ? 0 : size
         self.terminateAfter = terminateAfter
+      self.fields = fields
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -59,7 +64,8 @@ public struct SearchContainer: Encodable {
 
         try container.encodeIfPresent(query, forKey: .query)
         try container.encodeIfPresent(sort, forKey: .sort)
-
+      try container.encodeIfPresent(fields, forKey: .fields)
+      
         if aggs != nil && aggs!.count > 0 {
             var aggContainer = container.nestedContainer(keyedBy: DynamicKey.self, forKey: .aggs)
             for agg in aggs! {
