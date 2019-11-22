@@ -32,9 +32,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
       public let index: String
       public let type: String
       public let id: String
-      // The `score` property should be ideally optional; do this change
-      // next time it’s time to break things
-      public let score: Float
+      public let score: Float?
       public let source: T
       public let highlight: T?
       
@@ -54,7 +52,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
         self.id = try container.decode(String.self, forKey: .id)
         // The forced default value on `score` should be ideally removed; do this change
         // next time it’s time to break things
-        self.score = try container.decodeIfPresent(Float.self, forKey: .score) ?? 0
+        self.score = try container.decodeIfPresent(Float.self, forKey: .score)
         var source = try container.decode(T.self, forKey: .source)
         if var settableIDSource = source as? SettableID {
           settableIDSource.setID(self.id)

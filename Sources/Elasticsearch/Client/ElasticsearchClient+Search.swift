@@ -34,6 +34,8 @@ extension ElasticsearchClient {
         }
       }
       
+      print("RESPONSE JSON:\n\(jsonData?.prettyPrintedJSONString ?? "-")")
+      
       if let jsonData = jsonData {
         let decoded = try decoder.decode(SearchResponse<U>.self, from: jsonData)
         
@@ -42,5 +44,14 @@ extension ElasticsearchClient {
       
       throw ElasticsearchError(identifier: "search_failed", reason: "Could not execute search", source: .capture(), statusCode: 404)
     }
+  }
+}
+extension Data {
+  var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
+    guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
+      let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
+      let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
+    
+    return prettyPrintedString
   }
 }
