@@ -36,17 +36,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
       // next time it’s time to break things
       public let score: Decimal
       public let source: T
-      public let highlight: HitHighlight?
-      
-      // Contains all the possible fields that might be highlighted
-      public struct HitHighlight: Decodable {
-        public let title: [String]?
-        public let abstract: [String]?
-        enum CodingKeys: String, CodingKey {
-          case title
-          case abstract
-        }
-      }
+      public let highlight: T?
       
       enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -71,7 +61,11 @@ public struct SearchResponse<T: Decodable>: Decodable {
           source = settableIDSource as! T
         }
         self.source = source
-        self.highlight = try container.decode(HitHighlight.self, forKey: .highlight)
+        do {
+          self.highlight = try container.decode(T.self, forKey: .highlight)
+        } catch {
+          self.highlight = nil
+        }
       }
     }
     
