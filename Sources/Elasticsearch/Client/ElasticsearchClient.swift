@@ -126,7 +126,9 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
     logger?.record(query: request.description)
     
     return self.esConnection.send(request).map(to: Data?.self) { response in
-      
+
+      self.logger?.record(query: response.description)
+
       if response.body.data == nil {
         throw ElasticsearchError(identifier: "empty_response", reason: "Missing response body from Elasticsearch", source: .capture())
       }
