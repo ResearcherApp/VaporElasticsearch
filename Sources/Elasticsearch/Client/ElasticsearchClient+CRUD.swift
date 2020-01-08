@@ -24,7 +24,7 @@ extension ElasticsearchClient {
         storedFields: [String]? = nil,
         realtime: Bool? = nil
     ) -> Future<DocResponse<T>?> {
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(id)", routing: routing, version: version, storedFields: storedFields, realtime: realtime)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)", routing: routing, version: version, storedFields: storedFields, realtime: realtime)
         return send(HTTPMethod.GET, to: url.string!).map(to: DocResponse?.self) {jsonData in
             if let jsonData = jsonData {
                 return try self.decoder.decode(DocResponse<T>.self, from: jsonData)
@@ -51,7 +51,7 @@ extension ElasticsearchClient {
         version: Int? = nil,
         forceCreate: Bool? = nil
     ) -> Future<IndexResponse> {
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(id ?? "")", routing: routing, version: version, forceCreate: forceCreate)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id ?? "")", routing: routing, version: version, forceCreate: forceCreate)
         let method = id != nil ? HTTPMethod.PUT : HTTPMethod.POST
         let body: Data
         do {
@@ -90,7 +90,7 @@ extension ElasticsearchClient {
         routing: String? = nil,
         version: Int? = nil
     ) -> Future<IndexResponse>{
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(id)/_update", routing: routing, version: version)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)/_update", routing: routing, version: version)
         let body: Data
         do {
             let wrappedDoc: [String: T] = [ "doc" : doc ]
@@ -116,7 +116,7 @@ extension ElasticsearchClient {
         routing: String? = nil,
         version: Int? = nil
     ) -> Future<IndexResponse>{
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(id)/_update", routing: routing, version: version)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)/_update", routing: routing, version: version)
         let body: Data
         do {
             let wrappedScript: [String: Script] = [ "script" : script ]
@@ -153,7 +153,7 @@ extension ElasticsearchClient {
         routing: String? = nil,
         version: Int? = nil
     ) -> Future<IndexResponse>{
-        let url = ElasticsearchClient.generateURL(path: "/\(index)/\(id)", routing: routing, version: version)
+        let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)", routing: routing, version: version)
         return send(HTTPMethod.DELETE, to: url.string!).map(to: IndexResponse.self) {jsonData in
             if let jsonData = jsonData {
                 return try self.decoder.decode(IndexResponse.self, from: jsonData)
