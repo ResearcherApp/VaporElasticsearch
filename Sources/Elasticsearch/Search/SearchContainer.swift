@@ -11,7 +11,7 @@ public struct SearchContainer: Encodable {
     public let size: Int
     public let terminateAfter: Int?
   public let fields: [String]?
-  public let scriptFields: [Script]?
+  public let scriptFields: [[String: Script]]?
   public let highlight: Highlight?
 
     enum CodingKeys: String, CodingKey {
@@ -38,7 +38,7 @@ public struct SearchContainer: Encodable {
         size: Int = 10,
         terminateAfter: Int? = nil,
       fields: [String]? = nil,
-      scriptFields: [Script]? = nil,
+      scriptFields: [[String: Script]]? = nil,
       highlight: Highlight? = nil
     ) {
       self.init(query: query, sort: sort, aggs: aggs, from: from, size: size, terminateAfter: terminateAfter, fields: fields, scriptFields: scriptFields, highlight: highlight)
@@ -52,7 +52,7 @@ public struct SearchContainer: Encodable {
         size: Int = 10,
         terminateAfter: Int? = nil,
         fields: [String]? = nil,
-        scriptFields: [Script]? = nil,
+        scriptFields: [[String: Script]]? = nil,
         highlight: Highlight? = nil
     ) {
         self.query = query
