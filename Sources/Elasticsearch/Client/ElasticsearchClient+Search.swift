@@ -34,8 +34,6 @@ extension ElasticsearchClient {
         }
       }
       
-      print("RESPONSE JSON:\n\(jsonData?.prettyPrintedJSONString ?? "-")")
-      
       if let jsonData = jsonData {
         let decoded = try decoder.decode(SearchResponse<U>.self, from: jsonData)
         
