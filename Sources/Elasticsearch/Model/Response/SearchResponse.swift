@@ -36,6 +36,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
       public let source: T
       public let highlight: [String: [String]]?
       public let scriptFields: [String: [Int]]?
+      public let innerHits: [String: HitsContainer]?
       
       enum CodingKeys: String, CodingKey {
         case index = "_index"
@@ -45,6 +46,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
         case source = "_source"
         case highlight
         case scriptFields = "fields"
+        case innerHits = "inner_hits"
       }
       
       public init(from decoder: Decoder) throws {
@@ -70,6 +72,11 @@ public struct SearchResponse<T: Decodable>: Decodable {
           self.scriptFields = try container.decode([String: [Int]].self, forKey: .scriptFields)
         } catch {
           self.scriptFields = nil
+        }
+        do {
+          self.innerHits = try container.decode([String: HitsContainer].self, forKey: .innerHits)
+        } catch {
+          self.innerHits = nil
         }
       }
     }
