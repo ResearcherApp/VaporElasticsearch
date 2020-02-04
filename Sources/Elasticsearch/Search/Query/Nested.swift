@@ -30,7 +30,6 @@ public struct Nested: QueryElement {
         case path
         case query
         case scoreMode = "score_mode"
-        
     }
     
     /// :nodoc:
