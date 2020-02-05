@@ -129,20 +129,22 @@ public class ElasticsearchBulk {
         routing: String? = nil,
         version: Int? = nil,
         retryOnConflict: Int? = nil,
-        docAsUpsert: Bool = true
+        prewrapped: Bool = false
         ) throws {
         let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
 
-      print("DOC: \(doc)")
         // Add the document to the request body followed by a newline character (newline -> 10)
-      let wrappedDoc: [String: AnyEncodable] = [ "doc": AnyEncodable(doc), "doc_as_upsert": true ]
-      print("WRAPPEDDOC: \(wrappedDoc)")
-
+      if prewrapped {
+        requestBody.append(try encoder.encode(doc))
+      }
+      else {
+        let wrappedDoc: [String: T] = [ "doc": doc ]
         requestBody.append(try encoder.encode(wrappedDoc))
-      print("YIKES")
+      }
+        
         requestBody.append(10)
     }
 
