@@ -31,8 +31,8 @@ public struct BulkHeader: Encodable {
     enum CodingKeys: String, CodingKey {
         case index = "_index"
         case id = "_id"
-        case routing = "_routing"
-        case version = "_version"
+        case routing = "routing"
+        case version = "version"
         case retryOnConflict = "retry_on_conflict"
     }
 }
