@@ -128,7 +128,8 @@ public class ElasticsearchBulk {
         id: String? = nil,
         routing: String? = nil,
         version: Int? = nil,
-        retryOnConflict: Int? = nil
+        retryOnConflict: Int? = nil,
+        docAsUpsert: Bool = true
         ) throws {
         let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
         // Add the header to the request body followed by a newline character (newline -> 10)
@@ -136,8 +137,13 @@ public class ElasticsearchBulk {
         requestBody.append(10)
 
         // Add the document to the request body followed by a newline character (newline -> 10)
-        let wrappedDoc: [String: T] = [ "doc" : doc ]
-        requestBody.append(try encoder.encode(wrappedDoc))
+        var wrappedDoc: [String: T] = [ "doc" : doc ]
+      
+      
+      var json = try encoder.encode(wrappedDoc)
+      json.append(try encoder.encode(["doc_as_upsert": docAsUpsert]))
+        //requestBody.append(try encoder.encode(wrappedDoc))
+      requestBody.append(json)
         requestBody.append(10)
     }
 
