@@ -136,10 +136,13 @@ public class ElasticsearchBulk {
         requestBody.append(try encoder.encode(header))
         requestBody.append(10)
 
+      print("DOC: \(doc)")
         // Add the document to the request body followed by a newline character (newline -> 10)
       let wrappedDoc: [String: AnyEncodable] = [ "doc": AnyEncodable(doc), "doc_as_upsert": true ]
-      
+      print("WRAPPEDDOC: \(wrappedDoc)")
+
         requestBody.append(try encoder.encode(wrappedDoc))
+      print("YIKES")
         requestBody.append(10)
     }
 
