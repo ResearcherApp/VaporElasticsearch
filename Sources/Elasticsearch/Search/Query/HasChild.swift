@@ -20,10 +20,10 @@ public struct HasChild: QueryElement {
   public let query: QueryElement
   public let innerHits: [String: String]
   
-  public init(childType: String, query: QueryElement) {
+  public init(childType: String, query: QueryElement, innerHits: [String: String]? = [String: String]()) {
     self.childType = childType
     self.query = query
-    self.innerHits = [String: String]()
+    self.innerHits = innerHits ?? [String: String]()
   }
   
   private enum CodingKeys: String, CodingKey {
@@ -47,6 +47,6 @@ public struct HasChild: QueryElement {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.childType = try container.decode(String.self, forKey: .childType)
     self.query = try container.decode(AnyQueryElement.self, forKey: .query).base
-    self.innerHits = [String: String]()
+    self.innerHits = try container.decode([String: String].self, forKey: .innerHits)
   }
 }
