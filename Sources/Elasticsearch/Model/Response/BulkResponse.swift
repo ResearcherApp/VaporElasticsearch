@@ -57,6 +57,14 @@ public struct BulkResponse: Decodable {
         case items
     }
 
+  init(took: Int,
+       errors: Bool,
+       items: [BulkItemResponse]) {
+    self.took = took
+    self.errors = errors
+    self.items = items
+  }
+  
     /// :nodoc:
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)

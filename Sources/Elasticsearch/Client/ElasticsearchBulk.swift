@@ -171,23 +171,30 @@ public class ElasticsearchBulk {
     /// Executes the bulk operation
     ///
     /// - Returns: Returns the response from the bulk operation
-    public func send() -> Future<BulkResponse> {
-        // Add on a newline at the end to signal the end of the commands
-        requestBody.append(10)
-
-        let url = ElasticsearchClient.generateURL(path: "/_bulk")
-        var request = HTTPRequest(method: HTTPMethod.POST, url: url.string!, body: HTTPBody(data: requestBody))
-        request.headers.add(name: "Content-Type", value: "application/x-ndjson")
-
-        return client.send(request).map(to: BulkResponse.self) {jsonData in
-            if let jsonData = jsonData {
-                return try JSONDecoder().decode(BulkResponse.self, from: jsonData)
-            }
-
-            throw ElasticsearchError(identifier: "bulk_failed", reason: "Unexpected failure", source: .capture(), statusCode: 404)
+  public func send(ignoreErrors: Bool = false) throws -> Future<BulkResponse> {
+    // Add on a newline at the end to signal the end of the commands
+    requestBody.append(10)
+    
+    let url = ElasticsearchClient.generateURL(path: "/_bulk")
+    var request = HTTPRequest(method: HTTPMethod.POST, url: url.string!, body: HTTPBody(data: requestBody))
+    request.headers.add(name: "Content-Type", value: "application/x-ndjson")
+    
+    return client.send(request).map(to: BulkResponse.self) {jsonData in
+      if let jsonData = jsonData {
+        do {
+          return try JSONDecoder().decode(BulkResponse.self, from: jsonData)
         }
+        catch {
+          if ignoreErrors {
+            return BulkResponse(took: 0, errors: true, items: [BulkItemResponse]())
+          }
+        }
+      }
+      
+      throw ElasticsearchError(identifier: "bulk_failed", reason: "Unexpected failure", source: .capture(), statusCode: 404)
     }
-
+  }
+  
     private func mergeHeaders(_ base: BulkHeader, _ override: BulkHeader) -> BulkHeader {
         return BulkHeader(index: override.index ?? base.index,
                           id: override.id ?? base.id,
