@@ -8,12 +8,12 @@ public enum OperationType: String, Codable {
 
 public struct BulkItemResponse: Decodable {
     public var operationType: OperationType? = nil
-    public let shards: Shards
+    public let shards: Shards? = nil
     public let index: String
     public let type: String
     public let id: String
-    public let version: Int
-    public let result: ResultType
+    public let version: Int? = nil
+    public let result: ResultType?
     public let status: Int
     public let seqNo: Int? = nil
     public let primaryTerm: Int? = nil
