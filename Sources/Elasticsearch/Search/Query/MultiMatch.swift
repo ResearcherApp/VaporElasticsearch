@@ -15,6 +15,7 @@ public struct MultiMatch: QueryElement {
   public let analyzer: String?
   public let fuzziness: Int?
   public let tieBreaker: Decimal?
+  public let `operator`: String?
   
   public init(
     value: String,
@@ -22,7 +23,8 @@ public struct MultiMatch: QueryElement {
     type: Kind? = nil,
     analyzer: String? = nil,
     fuzziness: Int? = nil,
-    tieBreaker: Decimal? = nil
+    tieBreaker: Decimal? = nil,
+    `operator`: String? = nil
   ) {
     self.value = value
     self.fields = fields
@@ -30,6 +32,7 @@ public struct MultiMatch: QueryElement {
     self.analyzer = analyzer
     self.fuzziness = fuzziness
     self.tieBreaker = tieBreaker
+    self.operator = `operator`
   }
   
   public enum Kind: String, Codable {
@@ -47,6 +50,7 @@ public struct MultiMatch: QueryElement {
     case analyzer
     case fuzziness
     case tieBreaker = "tie_breaker"
+    case `operator` = "operator"
   }
 }
 
