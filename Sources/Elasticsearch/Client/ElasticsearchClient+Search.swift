@@ -16,6 +16,7 @@ extension ElasticsearchClient {
     decodeTo: U.Type,
     index: String,
     query: SearchContainer,
+    scroll: String? = nil,
     routing: String? = nil
   ) -> Future<SearchResponse<U>> {
     let body: Data
@@ -24,7 +25,9 @@ extension ElasticsearchClient {
     } catch {
       return worker.future(error: error)
     }
-    let url = ElasticsearchClient.generateURL(path: "/\(index)/_search", routing: routing)
+    var path = "/\(index)/_search"
+    if let scroll = scroll { path += "?scroll=\(scroll)" }
+    let url = ElasticsearchClient.generateURL(path: path, routing: routing)
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
       
       let decoder = JSONDecoder()
