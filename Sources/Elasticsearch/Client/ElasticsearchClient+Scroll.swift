@@ -21,7 +21,7 @@ extension ElasticsearchClient {
   public func scroll<U: Decodable>(
     decodeTo: U.Type,
     scrollId: String,
-    keepAlive: String = "1m"
+    keepAlive: ScrollKeepAlive = .oneMinute
   ) -> Future<SearchResponse<U>> {
     let scroll = ScrollContainer(scrollId, keepAlive: keepAlive)
     let body: Data

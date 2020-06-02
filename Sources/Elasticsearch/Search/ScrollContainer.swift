@@ -12,7 +12,7 @@ import Foundation
  */
 public struct ScrollContainer: Encodable {
   public let scrollId: String
-  public let keepAlive: String
+  public let keepAlive: ScrollKeepAlive
 
   enum CodingKeys: String, CodingKey {
     case scrollId = "scroll_id"
@@ -21,7 +21,7 @@ public struct ScrollContainer: Encodable {
   
   public init(
     _ scrollId: String,
-    keepAlive: String = "1m"
+    keepAlive: ScrollKeepAlive = .oneMinute
   ) {
     self.scrollId = scrollId
     self.keepAlive = keepAlive
@@ -31,6 +31,12 @@ public struct ScrollContainer: Encodable {
     var container = encoder.container(keyedBy: CodingKeys.self)
     
     try container.encode(scrollId, forKey: .scrollId)
-    try container.encode(keepAlive, forKey: .keepAlive)
+    try container.encode(keepAlive.rawValue, forKey: .keepAlive)
   }
+}
+
+public enum ScrollKeepAlive: String {
+  case thirtySeconds = "30s"
+  case oneMinute = "1m"
+  case fiveMinutes = "5m"
 }

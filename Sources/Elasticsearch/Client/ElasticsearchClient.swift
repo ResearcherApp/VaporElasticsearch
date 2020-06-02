@@ -57,7 +57,8 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
     version: Int? = nil,
     storedFields: [String]? = nil,
     realtime: Bool? = nil,
-    forceCreate: Bool? = nil
+    forceCreate: Bool? = nil,
+    scroll: ScrollKeepAlive? = nil
   ) -> URLComponents {
     var url = URLComponents()
     url.path = path
@@ -73,6 +74,9 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
     }
     if realtime != nil {
       query.append(URLQueryItem(name: "realtime", value: realtime! ? "true" : "false"))
+    }
+    if scroll != nil {
+      query.append(URLQueryItem(name: "scroll", value: "\(scroll!.rawValue)"))
     }
     url.queryItems = query
     
