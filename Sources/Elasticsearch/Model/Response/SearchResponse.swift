@@ -10,6 +10,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
   public let hits: HitsContainer?
   public let aggregations: Aggregations?
   public let terminatedEarly: Bool?
+  public let scrollId: String?
   
   public struct Shards: Decodable {
     public let total: Int
@@ -95,6 +96,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
     case hits
     case aggregations
     case terminatedEarly = "terminated_early"
+    case scrollId = "_scroll_id"
   }
   
   public init(from decoder: Decoder) throws {
@@ -105,6 +107,7 @@ public struct SearchResponse<T: Decodable>: Decodable {
     self.shards = try container.decode(Shards.self, forKey: .shards)
     self.hits = try container.decode(HitsContainer.self, forKey: .hits)
     self.terminatedEarly = try container.decodeIfPresent(Bool.self, forKey: .terminatedEarly)
+    self.scrollId = try container.decodeIfPresent(String.self, forKey: .scrollId)
     
     if container.contains(.aggregations) {
       let aggsContainer = try container.nestedContainer(keyedBy: DynamicKey.self, forKey: .aggregations)
