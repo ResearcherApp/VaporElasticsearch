@@ -161,4 +161,35 @@ extension ElasticsearchClient {
             throw ElasticsearchError(identifier: "indexing_failed", reason: "Cannot delete document", source: .capture(), statusCode: 404)
         }
     }
+  
+  /// Delete documents using a query
+  ///
+  /// - Parameters:
+  ///   - index: The document index
+  ///   - query: The query
+  ///   - routing: Routing information
+  ///   - version: Version information
+  /// - Returns: A Future IndexResponse
+  public func delete(
+    index: String,
+    query: Query,
+    routing: String? = nil,
+    version: Int? = nil
+  ) -> Future<DeleteByQueryResponse>{
+    let url = ElasticsearchClient.generateURL(path: "/\(index)/_delete_by_query", routing: routing, version: version)
+    let body: Data
+    do {
+      let wrappedScript: [String: Query] = [ "query" : query ]
+      body = try self.encoder.encode(wrappedScript)
+    } catch {
+      return worker.future(error: error)
+    }
+    return send(HTTPMethod.POST, to: url.string!, with: body).map(to: DeleteByQueryResponse.self) {jsonData in
+      if let jsonData = jsonData {
+        return try self.decoder.decode(DeleteByQueryResponse.self, from: jsonData)
+      }
+      throw ElasticsearchError(identifier: "indexing_failed", reason: "Cannot delete by query", source: .capture(), statusCode: 404)
+    }
+  }
+
 }
