@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SuggestResponse: Decodable {
+public struct SuggestResponse<T: Decodable>: Decodable {
     public let took: Int
     public let timedOut: Bool
     public let shards: Shards
@@ -41,10 +41,12 @@ public struct SuggestResponse: Decodable {
     public struct SuggestOption: Decodable {
         public let id: String
         public let text: String
+      public let source: T
 
         enum CodingKeys: String, CodingKey {
             case id = "_id"
             case text
+          case source = "_source"
         }
     }
 

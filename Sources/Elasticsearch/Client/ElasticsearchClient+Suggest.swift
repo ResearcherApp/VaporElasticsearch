@@ -11,11 +11,11 @@ extension ElasticsearchClient {
     ///   - query: A SearchContainer object that specifies the query to execute
     ///   - routing: Routing information
     /// - Returns: A Future SearchResponse
-    public func suggest(
+    public func suggest<U: Decodable>(
         index: String,
         query: SuggestContainer,
         routing: String? = nil
-    ) -> Future<SuggestResponse> {
+    ) -> Future<SuggestResponse<U>> {
         let body: Data
         do {
             body = try self.encoder.encode(query)
