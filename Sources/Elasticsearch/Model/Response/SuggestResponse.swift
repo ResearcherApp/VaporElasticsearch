@@ -21,10 +21,15 @@ public struct SuggestResponse: Decodable {
         public let failed: Int
     }
 
-    public struct HitsContainer: Decodable {
-        public let total: Int
-        public let maxScore: Decimal?
-    }
+  public struct HitsTotal: Decodable {
+    public let value: Int
+    public let relation: String
+  }
+  
+  public struct HitsContainer: Decodable {
+    public let total: HitsTotal
+    public let maxScore: Decimal?
+  }
 
     public struct SuggestResult: Decodable {
         public let text: String
