@@ -22,7 +22,7 @@ public struct HasChild: QueryElement {
   public let query: QueryElement
   public let innerHits: [String: String]
   
-  public init(childType: String, scoreMode: String?, minChildren: Int?, query: QueryElement, innerHits: [String: String]? = [String: String]()) {
+  public init(childType: String, scoreMode: String? = nil, minChildren: Int? = nil, query: QueryElement, innerHits: [String: String]? = [String: String]()) {
     self.childType = childType
     self.scoreMode = scoreMode
     self.minChildren = minChildren
