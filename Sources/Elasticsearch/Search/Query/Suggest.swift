@@ -4,11 +4,13 @@ public struct Suggest: Encodable {
     public let name: String
     public let prefix: String
     public let field: String
+  public let contexts: [String: [String]]?
 
-    public init(name: String, prefix: String, field: String) {
+  public init(name: String, prefix: String, field: String, contexts: [String: [String]]? = nil) {
         self.name = name
         self.prefix = prefix
         self.field = field
+    self.contexts = contexts
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -17,6 +19,7 @@ public struct Suggest: Encodable {
 
         try container.encode(prefix, forKey: .prefix)
         try completion.encode(field, forKey: .field)
+      try completion.encodeIfPresent(contexts, forKey: .contexts)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -26,5 +29,6 @@ public struct Suggest: Encodable {
 
     enum CompletionKeys: String, CodingKey {
         case field
+      case contexts
     }
 }
