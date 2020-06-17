@@ -20,14 +20,14 @@ public struct HasChild: QueryElement {
   public let scoreMode: String?
   public let minChildren: Int?
   public let query: QueryElement
-  public let innerHits: [String: String]
+  public let innerHits: [String: String]?
   
-  public init(childType: String, scoreMode: String? = nil, minChildren: Int? = nil, query: QueryElement, innerHits: [String: String]? = [String: String]()) {
+  public init(childType: String, scoreMode: String? = nil, minChildren: Int? = nil, query: QueryElement, innerHits: [String: String]? = nil) {
     self.childType = childType
     self.scoreMode = scoreMode
     self.minChildren = minChildren
     self.query = query
-    self.innerHits = innerHits ?? [String: String]()
+    self.innerHits = innerHits
   }
   
   private enum CodingKeys: String, CodingKey {
@@ -57,6 +57,6 @@ public struct HasChild: QueryElement {
     self.scoreMode = try container.decodeIfPresent(String.self, forKey: .scoreMode)
     self.minChildren = try container.decodeIfPresent(Int.self, forKey: .minChildren)
     self.query = try container.decode(AnyQueryElement.self, forKey: .query).base
-    self.innerHits = try container.decode([String: String].self, forKey: .innerHits)
+    self.innerHits = try container.decodeIfPresent([String: String].self, forKey: .innerHits)
   }
 }
