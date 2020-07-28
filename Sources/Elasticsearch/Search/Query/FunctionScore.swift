@@ -70,6 +70,8 @@ public struct FunctionScore: QueryElement {
         try container.encodeIfPresent(boost, forKey: .boost)
         try container.encodeIfPresent(maxBoost, forKey: .maxBoost)
         try container.encodeIfPresent(scoreMode, forKey: .scoreMode)
+        try container.encodeIfPresent(boostMode, forKey: .boostMode)
+        try container.encodeIfPresent(minScore, forKey: .minScore)
     }
     
     /// :nodoc:
