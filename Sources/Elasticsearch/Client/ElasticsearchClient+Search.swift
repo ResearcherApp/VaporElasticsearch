@@ -17,7 +17,8 @@ extension ElasticsearchClient {
     index: String,
     query: SearchContainer,
     scroll: ScrollKeepAlive? = nil,
-    routing: String? = nil
+    routing: String? = nil,
+    dateFormatter: DateFormatter? = nil
   ) -> Future<SearchResponse<U>> {
     let body: Data
     do {
@@ -29,11 +30,9 @@ extension ElasticsearchClient {
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
       
       let decoder = JSONDecoder()
-      
-      // ES date format
-      let isoMilisecondDateFormatter = DateFormatter()
-      isoMilisecondDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-      decoder.dateDecodingStrategy = .formatted(isoMilisecondDateFormatter)
+      if let dateFormatter = dateFormatter {
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
       
       if let aggregations = query.aggs {
         if aggregations.count > 0 {
