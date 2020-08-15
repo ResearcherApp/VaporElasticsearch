@@ -32,7 +32,7 @@ extension ElasticsearchClient {
       
       // ES date format
       let isoMilisecondDateFormatter = DateFormatter()
-      isoMilisecondDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+      isoMilisecondDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
       decoder.dateDecodingStrategy = .formatted(isoMilisecondDateFormatter)
       
       if let aggregations = query.aggs {
