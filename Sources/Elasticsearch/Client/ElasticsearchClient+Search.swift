@@ -29,6 +29,12 @@ extension ElasticsearchClient {
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
       
       let decoder = JSONDecoder()
+      
+      // ES date format
+      let isoMilisecondDateFormatter = DateFormatter()
+      isoMilisecondDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
+      decoder.dateDecodingStrategy = .formatted(isoMilisecondDateFormatter)
+      
       if let aggregations = query.aggs {
         if aggregations.count > 0 {
           decoder.userInfo(fromAggregations: aggregations)
