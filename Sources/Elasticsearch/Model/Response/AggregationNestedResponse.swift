@@ -11,11 +11,11 @@ public struct AggregationNestedResponse<T: Decodable>: AggregationResponse {
   public var name: String
 
   public let docCount: Int
-  public var aggregationBucketMap: [String: AggregationBucket<T>] = [:]
+  public var aggregationResponseMap: [String: AggregationResponse] = [:]
   
   enum CodingKeys: String, CodingKey {
     case docCount = "doc_count"
-    case aggregationBucketMap
+    case aggregationResponseMap
   }
   
   public init(from decoder: Decoder) throws {
@@ -30,8 +30,8 @@ public struct AggregationNestedResponse<T: Decodable>: AggregationResponse {
     for key in dynamicContainer.allKeys {
       do {
         print("Nested key: \(key)")
-        let nestedContainer = try dynamicContainer.decode(AggregationBucket<T>.self, forKey: key)
-        aggregationBucketMap[key.stringValue] = nestedContainer
+        let nestedContainer = try dynamicContainer.decode(AggregationTermsResponse<T>.self, forKey: key)
+        aggregationResponseMap[key.stringValue] = nestedContainer
       } catch {
         print("Key \(key) is not an AggregationBucket")
       }
