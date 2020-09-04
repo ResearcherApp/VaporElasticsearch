@@ -29,13 +29,8 @@ public struct AggregationNestedResponse<T: Decodable>: AggregationResponse {
 
     for key in dynamicContainer.allKeys {
       do {
-        let aggResponse = try dynamicContainer.decode(AnyAggregationResponse<T>.self, forKey: key).base
-        aggregationResponseMap[key.stringValue] = aggResponse
-
-        /*
         let nestedContainer = try dynamicContainer.decode(AggregationTermsResponse<T>.self, forKey: key)
         aggregationResponseMap[key.stringValue] = nestedContainer
-         */
       } catch {}
     }
   }
