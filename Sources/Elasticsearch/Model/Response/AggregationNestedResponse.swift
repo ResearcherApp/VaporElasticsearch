@@ -29,9 +29,12 @@ public struct AggregationNestedResponse<T: Decodable>: AggregationResponse {
 
     for key in dynamicContainer.allKeys {
       do {
+        print("Nested key: \(key)")
         let nestedContainer = try dynamicContainer.decode(AggregationBucket<T>.self, forKey: key)
         aggregationBucketMap[key.stringValue] = nestedContainer
-      } catch {}
+      } catch {
+        print("Key \(key) is not an AggregationBucket")
+      }
     }
   }
 }
