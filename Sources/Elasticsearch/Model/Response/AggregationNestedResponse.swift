@@ -33,7 +33,7 @@ public struct AggregationNestedResponse<T: Decodable>: AggregationResponse {
         let nestedContainer = try dynamicContainer.decode(AggregationTermsResponse<T>.self, forKey: key)
         aggregationResponseMap[key.stringValue] = nestedContainer
       } catch {
-        print("Key \(key) is not an AggregationBucket")
+        print("Key \(key) is not an AggregationTermsResponse")
       }
     }
   }
