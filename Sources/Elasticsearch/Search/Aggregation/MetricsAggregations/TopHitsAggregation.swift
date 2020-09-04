@@ -25,12 +25,17 @@ public struct TopHitsAggregation: Aggregation {
     
     /// :nodoc:
     public let size: Int?
+  
+  /// :nodoc:
+  public let includes: [String]?
     
     enum CodingKeys: String, CodingKey {
         case name
         case from
         case size
         case aggs
+      case includes
+      case source = "_source"
     }
     
     /// Creates a [top_hits](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-top-hits-aggregation.html) aggregation
@@ -39,10 +44,11 @@ public struct TopHitsAggregation: Aggregation {
     ///   - name: The aggregation name
     ///   - from: The offset from the first result you want to fetch
     ///   - size: The maximum number of top matching hits to return per bucket
-  public init(name: String, from: Int? = nil, size: Int? = nil, aggs: [Aggregation]? = nil) {
+  public init(name: String, from: Int? = nil, size: Int? = nil, includes: [String]? = nil, aggs: [Aggregation]? = nil) {
         self.name = name
         self.from = from
         self.size = size
+    self.includes = includes
         self.aggs = aggs
     }
     
@@ -52,6 +58,10 @@ public struct TopHitsAggregation: Aggregation {
         var valuesContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: DynamicKey(stringValue: type(of: self).typeKey.rawValue)!)
         try valuesContainer.encodeIfPresent(from, forKey: .from)
         try valuesContainer.encodeIfPresent(size, forKey: .size)
+      
+      var sourceContainer = valuesContainer.nestedContainer(keyedBy: CodingKeys.self, forKey: .source)
+      try sourceContainer.encodeIfPresent(includes, forKey: .includes)
+      
         if aggs != nil {
           if aggs != nil {
           if aggs != nil && aggs!.count > 0 {
