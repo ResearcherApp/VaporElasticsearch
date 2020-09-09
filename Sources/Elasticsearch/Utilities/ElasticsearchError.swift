@@ -1,4 +1,4 @@
-import Debugging
+import Vapor
 import COperatingSystem
 
 /// Errors that can be thrown while working with Elasticsearch.

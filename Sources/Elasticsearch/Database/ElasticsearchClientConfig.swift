@@ -1,4 +1,4 @@
-import DatabaseKit
+import Vapor
 
 /// Config options for an `ElasticsearchClient`.
 public struct ElasticsearchClientConfig: Service {

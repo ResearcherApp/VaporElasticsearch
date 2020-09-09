@@ -1,5 +1,4 @@
-import Async
-import HTTP
+import Vapor
 
 /**
  Connection methods

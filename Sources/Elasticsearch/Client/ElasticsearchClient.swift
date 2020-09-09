@@ -1,5 +1,4 @@
-import HTTP
-import DatabaseKit
+import Vapor
 
 /// A Elasticsearch client.
 public final class ElasticsearchClient: DatabaseConnection, BasicWorker {

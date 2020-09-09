@@ -1,5 +1,5 @@
 import Foundation
-import DatabaseKit
+import Vapor
 
 extension ElasticsearchDatabase: KeyedCacheSupporting {
     static func setupKeyedCache(client: ElasticsearchClient, on worker: Worker) -> Future<Void> {

@@ -1,5 +1,4 @@
-import HTTP
-import Crypto
+import Vapor
 
 internal struct ExtractFiltersAnalyzers: Decodable {
     public var filters: [String: TokenFilter]

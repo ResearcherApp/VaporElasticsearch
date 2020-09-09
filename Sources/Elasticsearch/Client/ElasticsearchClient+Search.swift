@@ -1,4 +1,4 @@
-import HTTP
+import Vapor
 
 /**
  Search methods.

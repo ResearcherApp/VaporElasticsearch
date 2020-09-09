@@ -1,4 +1,3 @@
-import Async
 
 extension ElasticsearchClient {
     public func fetchIndex(name: String) -> Future<ElasticsearchIndex?> {

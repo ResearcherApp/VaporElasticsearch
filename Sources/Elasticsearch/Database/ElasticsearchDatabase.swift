@@ -1,5 +1,4 @@
-import DatabaseKit
-import Async
+import Vapor
 
 public final class ElasticsearchDatabase: Database {
     public typealias Connection = ElasticsearchClient

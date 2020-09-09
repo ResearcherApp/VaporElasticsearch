@@ -1,5 +1,4 @@
-import DatabaseKit
-import Service
+import Vapor
 
 /// Provides base `Elasticsearch` services such as database and connection.
 public final class ElasticsearchProvider: Provider {

@@ -1,6 +1,5 @@
 
 import Foundation
-import HTTP
 
 extension ElasticsearchClient {
     /// Creates a new bulk operation.

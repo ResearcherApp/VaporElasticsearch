@@ -1,4 +1,4 @@
-import Async
+import Vapor
 
 /// An Elasticsearch logger.
 public protocol ElasticsearchLogger {
