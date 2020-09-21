@@ -18,7 +18,7 @@ extension ElasticsearchClient {
     query: SearchContainer,
     scroll: ScrollKeepAlive? = nil,
     routing: String? = nil,
-    dateFormatter: DateFormatter? = nil
+    dateFormatters: [DateFormatter]? = nil
   ) -> Future<SearchResponse<U>> {
     let body: Data
     do {
@@ -30,8 +30,21 @@ extension ElasticsearchClient {
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
       
       let decoder = JSONDecoder()
-      if let dateFormatter = dateFormatter {
-        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      if let dateFormatters = dateFormatters {
+        decoder.dateDecodingStrategy = .custom({ (decoder) -> Date in
+          let container = try decoder.singleValueContainer()
+          let dateStr = try container.decode(String.self)
+          // possible date strings: "2016-05-01",  "2016-07-04T17:37:21.119229Z", "2018-05-20T15:00:00Z"
+          var date: Date? = nil
+          for dateFormatter in dateFormatters {
+            date = dateFormatter.date(from: dateStr)
+            if date != nil { break }
+          }
+          guard let date_ = date else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateStr)")
+          }
+          return date_
+        })
       }
       
       if let aggregations = query.aggs {
@@ -59,3 +72,4 @@ extension Data {
     return prettyPrintedString
   }
 }
+
