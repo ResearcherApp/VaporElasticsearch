@@ -35,13 +35,16 @@ extension ElasticsearchClient {
           let container = try decoder.singleValueContainer()
           let dateStr = try container.decode(String.self)
           var date: Date? = nil
-          for dateFormatter in dateFormatters {
-            date = dateFormatter.date(from: dateStr)
-            if date != nil { break }
-          }
-          if date == nil,
-             let dateInt = Int(dateStr) {
+          // First try epoch millis
+          if let dateInt = Int(dateStr) {
             date = Date(milliseconds: dateInt)
+          }
+          // Now try formatters
+          if date == nil {
+            for dateFormatter in dateFormatters {
+              date = dateFormatter.date(from: dateStr)
+              if date != nil { break }
+            }
           }
           guard let date_ = date else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateStr)")
