@@ -34,11 +34,14 @@ extension ElasticsearchClient {
         decoder.dateDecodingStrategy = .custom({ (decoder) -> Date in
           let container = try decoder.singleValueContainer()
           let dateStr = try container.decode(String.self)
-          // possible date strings: "2016-05-01",  "2016-07-04T17:37:21.119229Z", "2018-05-20T15:00:00Z"
           var date: Date? = nil
           for dateFormatter in dateFormatters {
             date = dateFormatter.date(from: dateStr)
             if date != nil { break }
+          }
+          if date == nil,
+             let dateInt = Int(dateStr) {
+            date = Date(milliseconds: dateInt)
           }
           guard let date_ = date else {
             throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateStr)")
@@ -63,6 +66,7 @@ extension ElasticsearchClient {
     }
   }
 }
+
 extension Data {
   var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
     guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
@@ -73,3 +77,12 @@ extension Data {
   }
 }
 
+extension Date {
+  var millisecondsSince1970: Int {
+    return Int((self.timeIntervalSince1970 * 1000.0).rounded())
+  }
+  
+  init(milliseconds: Int) {
+    self = Date(timeIntervalSince1970: TimeInterval(milliseconds / 1000))
+  }
+}
