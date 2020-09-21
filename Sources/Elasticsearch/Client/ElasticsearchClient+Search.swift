@@ -18,7 +18,7 @@ extension ElasticsearchClient {
     query: SearchContainer,
     scroll: ScrollKeepAlive? = nil,
     routing: String? = nil,
-    dateFormatters: [DateFormatter]? = nil
+    dateFormatter: DateFormatter? = nil
   ) -> Future<SearchResponse<U>> {
     let body: Data
     do {
@@ -30,27 +30,8 @@ extension ElasticsearchClient {
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: SearchResponse.self) {jsonData in
       
       let decoder = JSONDecoder()
-      if let dateFormatters = dateFormatters {
-        decoder.dateDecodingStrategy = .custom({ (decoder) -> Date in
-          let container = try decoder.singleValueContainer()
-          let dateStr = try container.decode(String.self)
-          var date: Date? = nil
-          // First try epoch millis
-          if let dateInt = Int(dateStr) {
-            date = Date(milliseconds: dateInt)
-          }
-          // Now try formatters
-          if date == nil {
-            for dateFormatter in dateFormatters {
-              date = dateFormatter.date(from: dateStr)
-              if date != nil { break }
-            }
-          }
-          guard let date_ = date else {
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date string \(dateStr)")
-          }
-          return date_
-        })
+      if let dateFormatter = dateFormatter {
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
       }
       
       if let aggregations = query.aggs {
@@ -69,7 +50,6 @@ extension ElasticsearchClient {
     }
   }
 }
-
 extension Data {
   var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
     guard let object = try? JSONSerialization.jsonObject(with: self, options: []),
@@ -77,15 +57,5 @@ extension Data {
       let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return nil }
     
     return prettyPrintedString
-  }
-}
-
-extension Date {
-  var millisecondsSince1970: Int {
-    return Int((self.timeIntervalSince1970 * 1000.0).rounded())
-  }
-  
-  init(milliseconds: Int) {
-    self = Date(timeIntervalSince1970: TimeInterval(milliseconds / 1000))
   }
 }
