@@ -49,6 +49,47 @@ extension ElasticsearchClient {
       throw ElasticsearchError(identifier: "search_failed", reason: "Could not execute search", source: .capture(), statusCode: 404)
     }
   }
+  
+  /// Execute multiple searches in a given index
+  ///
+  /// - Parameters:
+  ///   - decodeTo: A struct or class that conforms to the Decodable protocol and can properly decode the documents stored in the index
+  ///   - index: The index to execute the query against
+  ///   - queries: A array of SearchContainer objects that specify the queries to execute
+  ///   - routing: Routing information
+  /// - Returns: A Future MultiSearchResponse
+  public func multiSearch<U: Decodable>(
+    decodeTo: U.Type,
+    index: String,
+    queries: [SearchContainer],
+    scroll: ScrollKeepAlive? = nil,
+    routing: String? = nil,
+    dateFormatter: DateFormatter? = nil
+  ) -> Future<MultiSearchResponse<U>> {
+    let body: Data
+    do {
+      body = try self.encoder.encode(queries)
+    } catch {
+      return worker.future(error: error)
+    }
+    let url = ElasticsearchClient.generateURL(path: "/\(index)/_msearch", routing: routing, scroll: scroll)
+    return send(HTTPMethod.POST, to: url.string!, with: body).map(to: MultiSearchResponse<U>.self) {jsonData in
+      
+      let decoder = JSONDecoder()
+      if let dateFormatter = dateFormatter {
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
+      
+      if let jsonData = jsonData {
+        let decoded = try decoder.decode(MultiSearchResponse<U>.self, from: jsonData)
+        
+        return decoded
+      }
+      
+      throw ElasticsearchError(identifier: "search_failed", reason: "Could not execute search", source: .capture(), statusCode: 404)
+    }
+  }
+  
 }
 extension Data {
   var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
