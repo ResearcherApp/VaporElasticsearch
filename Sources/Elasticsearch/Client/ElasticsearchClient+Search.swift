@@ -68,18 +68,13 @@ extension ElasticsearchClient {
   ) -> Future<MultiSearchResponse<U>> {
     var body = Data(capacity: 10 * 1024 * 1024)
     do {
-      var firstQuery = true
       for query in queries {
-        if firstQuery {
-          body = try self.encoder.encode(query)
-        }
-        else {
-          firstQuery = false
-          body.append(10)
-          body.append(try self.encoder.encode(query))
-        }
+        let header = [String:String]()
+        body.append(try encoder.encode(header))
+        body.append(10)
+        body.append(try self.encoder.encode(query))
+        body.append(10)
       }
-      body.append(10)
     } catch {
       return worker.future(error: error)
     }
