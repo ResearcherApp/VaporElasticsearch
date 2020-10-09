@@ -66,9 +66,20 @@ extension ElasticsearchClient {
     routing: String? = nil,
     dateFormatter: DateFormatter? = nil
   ) -> Future<MultiSearchResponse<U>> {
-    let body: Data
+    var body = Data(capacity: 10 * 1024 * 1024)
     do {
-      body = try self.encoder.encode(queries)
+      var firstQuery = true
+      for query in queries {
+        if firstQuery {
+          body = try self.encoder.encode(query)
+        }
+        else {
+          firstQuery = false
+          body.append(10)
+          body.append(try self.encoder.encode(query))
+        }
+      }
+      body.append(10)
     } catch {
       return worker.future(error: error)
     }
