@@ -19,6 +19,7 @@ public enum AggregationResponseMap : String, Encodable {
     case dateHistogram
     case histogram
     case nested
+    case sampler
 
     func metatype<T: Decodable>(docType: T.Type) -> AggregationResponse.Type? {
         switch self {
@@ -52,6 +53,8 @@ public enum AggregationResponseMap : String, Encodable {
             return AggregationHistogramResponse.self
         case .nested:
             return AggregationNestedResponse<T>.self
+        case .sampler:
+          return AggregationSamplerResponse<T>.self
         }
     }
 }
