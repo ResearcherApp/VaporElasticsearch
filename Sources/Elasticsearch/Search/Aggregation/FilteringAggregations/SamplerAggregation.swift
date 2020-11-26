@@ -53,9 +53,7 @@ public struct SamplerAggregation: Aggregation {
   
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: DynamicKey.self)
-    var valuesContainer = container.nestedContainer(keyedBy: CodingKeys.self, forKey: DynamicKey(stringValue: type(of: self).typeKey.rawValue)!)
-    
-    try valuesContainer.encode(sampler, forKey: .sampler)
+    try container.encode(sampler, forKey: DynamicKey(stringValue: "sampler")!)
     
     if aggs != nil && aggs!.count > 0 {
       var aggContainer = container.nestedContainer(keyedBy: DynamicKey.self, forKey: DynamicKey(stringValue: "aggs")!)
