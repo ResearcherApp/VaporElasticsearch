@@ -21,7 +21,7 @@ public struct AggregationBucket<T: Decodable>: Decodable {
     }
 
   public struct BucketScore: Decodable {
-    var value: Double
+    public var value: Double
     enum CodingKeys: String, CodingKey {
       case value
     }
