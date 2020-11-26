@@ -9,6 +9,7 @@ public struct AggregationBucket<T: Decodable>: Decodable {
     public let key: String
     public let docCount: Int
     public let docCountErrorUpperBound: Int?
+    public let score: BucketScore?
     public var hitsMap: AggregationHits = [:]
 
     enum CodingKeys: String, CodingKey {
@@ -16,13 +17,22 @@ public struct AggregationBucket<T: Decodable>: Decodable {
         case hitsMap
         case docCount = "doc_count"
         case docCountErrorUpperBound = "doc_count_error_upper_bound"
+      case score
     }
 
+  public struct BucketScore: Decodable {
+    var value: Double
+    enum CodingKeys: String, CodingKey {
+      case value
+    }
+  }
+  
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         docCount = try container.decode(Int.self, forKey: .docCount)
         docCountErrorUpperBound = try container.decodeIfPresent(Int.self,
                                                                 forKey: .docCountErrorUpperBound)
+      score = try container.decodeIfPresent(BucketScore.self, forKey: .score)
 
         if let value = try? container.decode(Int.self, forKey: .key) {
             key = String(value)
