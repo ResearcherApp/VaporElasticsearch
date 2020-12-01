@@ -31,6 +31,7 @@ public enum QueryElementMap : String, Codable {
   case geoPolygon = "geo_polygon"
   case percolate
   case hasChild = "has_child"
+  case hasParent = "has_parent"
   
   var metatype: QueryElement.Type {
     switch self {
@@ -94,6 +95,8 @@ public enum QueryElementMap : String, Codable {
       return Percolate.self
     case .hasChild:
       return HasChild.self
+    case .hasParent:
+      return HasParent.self
     }
   }
 }
