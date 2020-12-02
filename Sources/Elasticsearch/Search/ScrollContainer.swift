@@ -39,4 +39,7 @@ public enum ScrollKeepAlive: String {
   case thirtySeconds = "30s"
   case oneMinute = "1m"
   case fiveMinutes = "5m"
+  case tenMinutes = "10m"
+  case thirtyMinutes = "30m"
+  case oneHour = "1h"
 }
