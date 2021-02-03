@@ -58,7 +58,8 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
     storedFields: [String]? = nil,
     realtime: Bool? = nil,
     forceCreate: Bool? = nil,
-    scroll: ScrollKeepAlive? = nil
+    scroll: ScrollKeepAlive? = nil,
+    waitForCompletion: Bool = true
   ) -> URLComponents {
     var url = URLComponents()
     url.path = path
@@ -77,6 +78,9 @@ public final class ElasticsearchClient: DatabaseConnection, BasicWorker {
     }
     if scroll != nil {
       query.append(URLQueryItem(name: "scroll", value: "\(scroll!.rawValue)"))
+    }
+    if !waitForCompletion {
+      query.append(URLQueryItem(name: "wait_for_completion", value: "false"))
     }
     url.queryItems = query
     

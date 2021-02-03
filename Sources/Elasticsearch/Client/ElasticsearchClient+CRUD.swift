@@ -174,9 +174,10 @@ extension ElasticsearchClient {
     index: String,
     query: Query,
     routing: String? = nil,
-    version: Int? = nil
+    version: Int? = nil,
+    waitForCompletion: Bool = true
   ) -> Future<DeleteByQueryResponse>{
-    let url = ElasticsearchClient.generateURL(path: "/\(index)/_delete_by_query", routing: routing, version: version)
+    let url = ElasticsearchClient.generateURL(path: "/\(index)/_delete_by_query", routing: routing, version: version, waitForCompletion: waitForCompletion)
     let body: Data
     do {
       let wrappedScript: [String: Query] = [ "query" : query ]
@@ -187,6 +188,11 @@ extension ElasticsearchClient {
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: DeleteByQueryResponse.self) {jsonData in
       if let jsonData = jsonData {
         return try self.decoder.decode(DeleteByQueryResponse.self, from: jsonData)
+      }
+      if waitForCompletion == false {
+        // If this is waiting for a response, then we get a task number and no delete details so return empty delete response
+        // This is a bit of a hack - we should really get the task id and return that instead
+        return DeleteByQueryResponse(took: 0, timedOut: false, total: 0, deleted: 0, batches: 0, versionConflicts: 0, noops: 0)
       }
       throw ElasticsearchError(identifier: "indexing_failed", reason: "Cannot delete by query", source: .capture(), statusCode: 404)
     }
