@@ -187,12 +187,19 @@ extension ElasticsearchClient {
     }
     return send(HTTPMethod.POST, to: url.string!, with: body).map(to: DeleteByQueryResponse.self) {jsonData in
       if let jsonData = jsonData {
-        return try self.decoder.decode(DeleteByQueryResponse.self, from: jsonData)
-      }
-      if waitForCompletion == false {
-        // If this is waiting for a response, then we get a task number and no delete details so return empty delete response
-        // This is a bit of a hack - we should really get the task id and return that instead
-        return DeleteByQueryResponse(took: 0, timedOut: false, total: 0, deleted: 0, batches: 0, versionConflicts: 0, noops: 0)
+        do {
+          return try self.decoder.decode(DeleteByQueryResponse.self, from: jsonData)
+        } catch {
+          if waitForCompletion == false {
+            do {
+              let taskResponse = try self.decoder.decode(TaskResponse.self, from: jsonData)
+              self.logger?.record(query: "Delete by query task: \(taskResponse.task)")
+            } catch {}
+            // If this is waiting for a response, then we get a task number and no delete details so return empty delete response
+            // This is a bit of a hack - we should really get the task id and return that instead
+            return DeleteByQueryResponse(took: 0, timedOut: false, total: 0, deleted: 0, batches: 0, versionConflicts: 0, noops: 0)
+          }
+        }
       }
       throw ElasticsearchError(identifier: "indexing_failed", reason: "Cannot delete by query", source: .capture(), statusCode: 404)
     }
