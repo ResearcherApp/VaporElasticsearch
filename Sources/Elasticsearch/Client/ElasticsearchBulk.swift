@@ -123,7 +123,7 @@ public class ElasticsearchBulk {
     ///   - version: Version information
     /// - Throws: Can throw errors if there are issues encoding the doc.
     public func update<T: Codable>(
-        doc :T,
+        doc: T,
         index: String? = nil,
         id: String? = nil,
         routing: String? = nil,
@@ -147,6 +147,34 @@ public class ElasticsearchBulk {
         
         requestBody.append(10)
     }
+
+  /// Add a script to be run in the bulk operation
+  ///
+  /// - Parameters:
+  ///   - script: The script to be run
+  ///   - index: The index to put the document into
+  ///   - id: The id to use for the document
+  ///   - routing: Routing information
+  ///   - version: Version information
+  /// - Throws: Can throw errors if there are issues encoding the doc.
+  public func update(
+    script: Script,
+    index: String? = nil,
+    id: String? = nil,
+    routing: String? = nil,
+    version: Int? = nil,
+    retryOnConflict: Int? = nil
+  ) throws {
+    let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
+    // Add the header to the request body followed by a newline character (newline -> 10)
+    requestBody.append(try encoder.encode(header))
+    requestBody.append(10)
+    
+    // Add the script to the request body followed by a newline character (newline -> 10)
+    let wrappedScript: [String: Script] = [ "script": script ]
+    requestBody.append(try encoder.encode(wrappedScript))
+    requestBody.append(10)
+  }
 
     /// Add a document to be deleted by the bulk operation
     ///
