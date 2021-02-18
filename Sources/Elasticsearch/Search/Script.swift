@@ -39,41 +39,47 @@ public struct Script: Codable {
     /// :nodoc:
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-
+      
         try container.encodeIfPresent(lang, forKey: .lang)
         try container.encodeIfPresent(source, forKey: .source)
         try container.encodeIfPresent(id, forKey: .id)
 
         if params != nil && params!.count > 0 {
             var keyedContainer = container.nestedContainer(keyedBy: DynamicKey.self, forKey: .params)
-            for (name, value) in params! {
-                switch value {
-                case is Int:
-                    try keyedContainer.encode(value as! Int, forKey: DynamicKey(stringValue: name)!)
-                case is Int8:
-                    try keyedContainer.encode(value as! Int8, forKey: DynamicKey(stringValue: name)!)
-                case is Int16:
-                    try keyedContainer.encode(value as! Int16, forKey: DynamicKey(stringValue: name)!)
-                case is Int32:
-                    try keyedContainer.encode(value as! Int32, forKey: DynamicKey(stringValue: name)!)
-                case is Int64:
-                    try keyedContainer.encode(value as! Int64, forKey: DynamicKey(stringValue: name)!)
-                case is Float:
-                    try keyedContainer.encode(value as! Float, forKey: DynamicKey(stringValue: name)!)
-                case is Double:
-                    try keyedContainer.encode(value as! Double, forKey: DynamicKey(stringValue: name)!)
-                case is Bool:
-                    try keyedContainer.encode(value as! Bool, forKey: DynamicKey(stringValue: name)!)
-                case is String:
-                    try keyedContainer.encode(value as! String, forKey: DynamicKey(stringValue: name)!)
-                case is [String]:
-                    try keyedContainer.encode(value as! [String], forKey: DynamicKey(stringValue: name)!)
-                default:
-                    continue
-                }
-            }
+          try encodeParams(params: params!, in: &keyedContainer)
         }
     }
+  private func encodeParams(params: [String: Any], in keyedContainer: inout KeyedEncodingContainer<DynamicKey>) throws {
+    for (name, value) in params {
+      switch value {
+      case is Int:
+        try keyedContainer.encode(value as! Int, forKey: DynamicKey(stringValue: name)!)
+      case is Int8:
+        try keyedContainer.encode(value as! Int8, forKey: DynamicKey(stringValue: name)!)
+      case is Int16:
+        try keyedContainer.encode(value as! Int16, forKey: DynamicKey(stringValue: name)!)
+      case is Int32:
+        try keyedContainer.encode(value as! Int32, forKey: DynamicKey(stringValue: name)!)
+      case is Int64:
+        try keyedContainer.encode(value as! Int64, forKey: DynamicKey(stringValue: name)!)
+      case is Float:
+        try keyedContainer.encode(value as! Float, forKey: DynamicKey(stringValue: name)!)
+      case is Double:
+        try keyedContainer.encode(value as! Double, forKey: DynamicKey(stringValue: name)!)
+      case is Bool:
+        try keyedContainer.encode(value as! Bool, forKey: DynamicKey(stringValue: name)!)
+      case is String:
+        try keyedContainer.encode(value as! String, forKey: DynamicKey(stringValue: name)!)
+      case is [String]:
+        try keyedContainer.encode(value as! [String], forKey: DynamicKey(stringValue: name)!)
+      case is [String: Any]:
+        var innerKeyedContainer = keyedContainer.nestedContainer(keyedBy: DynamicKey.self, forKey: DynamicKey(stringValue: name)!)
+        try encodeParams(params: value as! [String: Any], in: &innerKeyedContainer)
+      default:
+        continue
+      }
+    }
+  }
 
     /// :nodoc:
     public init(from decoder: Decoder) throws {
