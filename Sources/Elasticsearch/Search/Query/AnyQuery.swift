@@ -10,6 +10,7 @@ public enum QueryElementMap : String, Codable {
   case matchAll = "match_all"
   case matchNone = "match_none"
   case matchPhrase = "match_phrase"
+  case moreLikeThis = "more_like_this"
   case multiMatch = "multi_match"
   case prefix
   case range
@@ -53,6 +54,8 @@ public enum QueryElementMap : String, Codable {
       return MatchNone.self
     case .matchPhrase:
       return MatchPhrase.self
+    case .moreLikeThis:
+      return MoreLikeThis.self
     case .multiMatch:
       return MultiMatch.self
     case .nested:
