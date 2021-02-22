@@ -16,14 +16,14 @@ public struct MoreLikeThis: QueryElement {
   /// :nodoc:
   public static var typeKey = QueryElementMap.moreLikeThis
   
-  public struct MoreLikeThisDoc: Codable {
+  public struct LikeDoc: Codable {
     public let index: String
     public let id: String
     enum CodingKeys: String, CodingKey {
       case index = "_index"
       case id = "_id"
     }
-    init(index: String,
+    public init(index: String,
          id: String) {
       self.index = index
       self.id = id
@@ -31,7 +31,7 @@ public struct MoreLikeThis: QueryElement {
   }
   
   public let fields: [String]
-  public let like: [MoreLikeThisDoc]?
+  public let like: [LikeDoc]?
   public let maxQueryTerms: Int?
   public let minTermFrequency: Int?
   public let minDocFrequency: Int?
@@ -41,7 +41,7 @@ public struct MoreLikeThis: QueryElement {
 
   public init(
     fields: [String],
-    like: [MoreLikeThisDoc]?,
+    like: [LikeDoc]?,
     maxQueryTerms: Int? = nil,
     minTermFrequency: Int? = nil,
     minDocFrequency: Int? = nil,
