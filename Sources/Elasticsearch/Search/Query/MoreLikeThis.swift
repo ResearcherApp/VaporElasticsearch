@@ -23,6 +23,11 @@ public struct MoreLikeThis: QueryElement {
       case index = "_index"
       case id = "_id"
     }
+    init(index: String,
+         id: String) {
+      self.index = index
+      self.id = id
+    }
   }
   
   public let fields: [String]
