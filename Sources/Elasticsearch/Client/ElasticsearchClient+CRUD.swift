@@ -49,10 +49,17 @@ extension ElasticsearchClient {
         id: String? = nil,
         routing: String? = nil,
         version: Int? = nil,
-        forceCreate: Bool? = nil
+        forceCreate: Bool? = nil,
+      dateFormatter: DateFormatter? = nil
     ) -> Future<IndexResponse> {
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id ?? "")", routing: routing, version: version, forceCreate: forceCreate)
         let method = id != nil ? HTTPMethod.PUT : HTTPMethod.POST
+      
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
+      
         let body: Data
         do {
             body = try self.encoder.encode(doc)
@@ -88,10 +95,17 @@ extension ElasticsearchClient {
         index: String,
         id: String,
         routing: String? = nil,
-        version: Int? = nil
+      version: Int? = nil,
+      dateFormatter: DateFormatter? = nil
     ) -> Future<IndexResponse>{
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)/_update", routing: routing, version: version)
         let body: Data
+      
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
+
         do {
             let wrappedDoc: [String: T] = [ "doc" : doc ]
             body = try self.encoder.encode(wrappedDoc)
@@ -114,10 +128,17 @@ extension ElasticsearchClient {
         index: String,
         id: String,
         routing: String? = nil,
-        version: Int? = nil
+      version: Int? = nil,
+      dateFormatter: DateFormatter? = nil
     ) -> Future<IndexResponse>{
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)/_update", routing: routing, version: version)
         let body: Data
+      
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
+
         do {
             let wrappedScript: [String: Script] = [ "script" : script ]
             body = try self.encoder.encode(wrappedScript)
