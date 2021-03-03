@@ -75,8 +75,14 @@ public class ElasticsearchBulk {
         index: String? = nil,
         id: String? = nil,
         routing: String? = nil,
-        version: Int? = nil
+      version: Int? = nil,
+      dateFormatter: DateFormatter? = nil
         ) throws {
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
+      }
+      
         let header = ["index": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: nil))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
@@ -101,8 +107,14 @@ public class ElasticsearchBulk {
         index: String? = nil,
         id: String? = nil,
         routing: String? = nil,
-        version: Int? = nil
+      version: Int? = nil,
+      dateFormatter: DateFormatter? = nil
         ) throws {
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
+      }
+
         let header = ["create": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: nil))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
@@ -129,8 +141,14 @@ public class ElasticsearchBulk {
         routing: String? = nil,
         version: Int? = nil,
         retryOnConflict: Int? = nil,
-        prewrapped: Bool = false
+      prewrapped: Bool = false,
+      dateFormatter: DateFormatter? = nil
         ) throws {
+      // Set any custom date formatter
+      if let dateFormatter = dateFormatter {
+        encoder.dateEncodingStrategy = .formatted(dateFormatter)
+      }
+
         let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
         // Add the header to the request body followed by a newline character (newline -> 10)
         requestBody.append(try encoder.encode(header))
@@ -163,8 +181,14 @@ public class ElasticsearchBulk {
     id: String? = nil,
     routing: String? = nil,
     version: Int? = nil,
-    retryOnConflict: Int? = nil
+    retryOnConflict: Int? = nil,
+    dateFormatter: DateFormatter? = nil
   ) throws {
+    // Set any custom date formatter
+    if let dateFormatter = dateFormatter {
+      encoder.dateEncodingStrategy = .formatted(dateFormatter)
+    }
+
     let header = ["update": mergeHeaders(defaultHeader, BulkHeader(index: index, id: id, routing: routing, version: version, retryOnConflict: retryOnConflict))]
     // Add the header to the request body followed by a newline character (newline -> 10)
     requestBody.append(try encoder.encode(header))
