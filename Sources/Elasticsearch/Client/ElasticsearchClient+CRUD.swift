@@ -57,7 +57,7 @@ extension ElasticsearchClient {
       
       // Set any custom date formatter
       if let dateFormatter = dateFormatter {
-        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        self.encoder.dateEncodingStrategy = .formatted(dateFormatter)
       }
       
         let body: Data
@@ -103,7 +103,7 @@ extension ElasticsearchClient {
       
       // Set any custom date formatter
       if let dateFormatter = dateFormatter {
-        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        self.encoder.dateEncodingStrategy = .formatted(dateFormatter)
       }
 
         do {
@@ -136,7 +136,7 @@ extension ElasticsearchClient {
       
       // Set any custom date formatter
       if let dateFormatter = dateFormatter {
-        self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        self.encoder.dateEncodingStrategy = .formatted(dateFormatter)
       }
 
         do {
