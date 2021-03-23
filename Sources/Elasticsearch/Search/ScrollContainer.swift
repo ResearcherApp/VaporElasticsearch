@@ -36,6 +36,7 @@ public struct ScrollContainer: Encodable {
 }
 
 public enum ScrollKeepAlive: String {
+  case tenSeconds = "10s"
   case thirtySeconds = "30s"
   case oneMinute = "1m"
   case fiveMinutes = "5m"
