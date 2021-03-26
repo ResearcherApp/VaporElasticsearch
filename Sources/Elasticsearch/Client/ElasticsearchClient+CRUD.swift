@@ -22,11 +22,17 @@ extension ElasticsearchClient {
         routing: String? = nil,
         version: Int? = nil,
         storedFields: [String]? = nil,
-        realtime: Bool? = nil
+      realtime: Bool? = nil,
+      dateFormatter: DateFormatter? = nil
     ) -> Future<DocResponse<T>?> {
         let url = ElasticsearchClient.generateURL(path: "/\(index)/_doc/\(id)", routing: routing, version: version, storedFields: storedFields, realtime: realtime)
         return send(HTTPMethod.GET, to: url.string!).map(to: DocResponse?.self) {jsonData in
             if let jsonData = jsonData {
+              
+              if let dateFormatter = dateFormatter {
+                self.decoder.dateDecodingStrategy = .formatted(dateFormatter)
+              }
+
                 return try self.decoder.decode(DocResponse<T>.self, from: jsonData)
             }
             return nil
