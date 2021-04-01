@@ -98,6 +98,7 @@ extension ElasticsearchClient {
     ///
     public func update<T: Encodable>(
         doc: T,
+      prewrapped: Bool = false,
         index: String,
         id: String,
         routing: String? = nil,
@@ -113,8 +114,15 @@ extension ElasticsearchClient {
       }
 
         do {
+          
+          if prewrapped {
+            body = try self.encoder.encode(doc)
+          }
+          else {
             let wrappedDoc: [String: T] = [ "doc" : doc ]
             body = try self.encoder.encode(wrappedDoc)
+          }
+
         } catch {
             return worker.future(error: error)
         }
