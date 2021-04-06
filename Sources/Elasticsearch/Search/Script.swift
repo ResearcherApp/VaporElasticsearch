@@ -75,6 +75,38 @@ public struct Script: Codable {
       case is [String: Any]:
         var innerKeyedContainer = keyedContainer.nestedContainer(keyedBy: DynamicKey.self, forKey: DynamicKey(stringValue: name)!)
         try encodeParams(params: value as! [String: Any], in: &innerKeyedContainer)
+      case is [[String: Any]]:
+        var innerUnkeyedContainer = keyedContainer.nestedUnkeyedContainer(forKey: DynamicKey(stringValue: name)!)
+        let array = value as! [[String: Any]]
+        for element in array {
+          var nestedContainer = innerUnkeyedContainer.nestedContainer(keyedBy: DynamicKey.self)
+          for (name, value) in element {
+            switch value {
+            case is Int:
+              try nestedContainer.encode(value as! Int, forKey: DynamicKey(stringValue: name)!)
+            case is Int8:
+              try nestedContainer.encode(value as! Int8, forKey: DynamicKey(stringValue: name)!)
+            case is Int16:
+              try nestedContainer.encode(value as! Int16, forKey: DynamicKey(stringValue: name)!)
+            case is Int32:
+              try nestedContainer.encode(value as! Int32, forKey: DynamicKey(stringValue: name)!)
+            case is Int64:
+              try nestedContainer.encode(value as! Int64, forKey: DynamicKey(stringValue: name)!)
+            case is Float:
+              try nestedContainer.encode(value as! Float, forKey: DynamicKey(stringValue: name)!)
+            case is Double:
+              try nestedContainer.encode(value as! Double, forKey: DynamicKey(stringValue: name)!)
+            case is Bool:
+              try nestedContainer.encode(value as! Bool, forKey: DynamicKey(stringValue: name)!)
+            case is String:
+              try nestedContainer.encode(value as! String, forKey: DynamicKey(stringValue: name)!)
+            case is [String]:
+              try nestedContainer.encode(value as! [String], forKey: DynamicKey(stringValue: name)!)
+            default:
+              ()
+            }
+          }
+        }
       default:
         continue
       }
