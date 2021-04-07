@@ -174,6 +174,70 @@ extension ElasticsearchClient {
         }
     }
 
+  /// Updates documents using a query
+  ///
+  /// - Parameters:
+  ///   - index: The document index
+  ///   - query: The query
+  ///   - script: The Script to execute
+  ///   - routing: Routing information
+  ///   - version: Version information
+  /// - Returns: A Future IndexResponse
+  public func update(
+    script: Script,
+    query: Query,
+    index: String,
+    routing: String? = nil,
+    version: Int? = nil,
+    waitForCompletion: Bool = true
+  ) -> Future<UpdateByQueryResponse>{
+    let url = ElasticsearchClient.generateURL(path: "/\(index)/_update_by_query", routing: routing, version: version, waitForCompletion: waitForCompletion)
+    let body: Data
+    do {
+      let wrappedScriptAndQuery = UpdateByQueryScript(script: script, query: query)
+      body = try self.encoder.encode(wrappedScriptAndQuery)
+    } catch {
+      return worker.future(error: error)
+    }
+    return send(HTTPMethod.POST, to: url.string!, with: body).map(to: UpdateByQueryResponse.self) {jsonData in
+      if let jsonData = jsonData {
+        do {
+          return try self.decoder.decode(UpdateByQueryResponse.self, from: jsonData)
+        } catch {
+          if waitForCompletion == false {
+            do {
+              let taskResponse = try self.decoder.decode(TaskResponse.self, from: jsonData)
+              self.logger?.record(query: "Update by query task: \(taskResponse.task)")
+            } catch {}
+            // If this is waiting for a response, then we get a task number and no update details so return empty update response
+            // This is a bit of a hack - we should really get the task id and return that instead
+            return UpdateByQueryResponse(took: 0, timedOut: false, total: 0, updated: 0, batches: 0, versionConflicts: 0, noops: 0)
+          }
+        }
+      }
+      throw ElasticsearchError(identifier: "indexing_failed", reason: "Cannot update by query", source: .capture(), statusCode: 404)
+    }
+  }
+  private struct UpdateByQueryScript: Codable {
+    let script: Script
+    let query: Query
+    enum CodingKeys: String, CodingKey {
+      case script
+      case query
+    }
+    public init(script: Script,
+                query: Query) {
+      self.script = script
+      self.query = query
+    }
+    public func encode(to encoder: Encoder) throws {
+      var container = encoder.container(keyedBy: CodingKeys.self)
+      try container.encode(script, forKey: .script)
+      try container.encode(query, forKey: .query)
+    }
+  }
+  
+  
     /// Delete the document with the given id
     ///
     /// - Parameters:
