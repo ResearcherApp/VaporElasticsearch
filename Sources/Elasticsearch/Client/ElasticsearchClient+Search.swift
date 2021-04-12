@@ -104,7 +104,7 @@ extension ElasticsearchClient {
   /// - Returns: A Future SearchResponse
   public func count (
     index: String,
-    query: SearchContainer,
+    query: Query,
     dateFormatter: DateFormatter? = nil
   ) -> Future<CountResponse> {
     let body: Data
