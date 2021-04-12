@@ -96,6 +96,42 @@ extension ElasticsearchClient {
     }
   }
   
+  /// Execute a count search in a given index
+  ///
+  /// - Parameters:
+  ///   - index: The index to execute the query against
+  ///   - query: A SearchContainer object that specifies the query to execute
+  /// - Returns: A Future SearchResponse
+  public func count (
+    index: String,
+    query: SearchContainer,
+    dateFormatter: DateFormatter? = nil
+  ) -> Future<CountResponse> {
+    let body: Data
+    do {
+      body = try self.encoder.encode(query)
+    } catch {
+      return worker.future(error: error)
+    }
+    let url = ElasticsearchClient.generateURL(path: "/\(index)/_count")
+    return send(HTTPMethod.POST, to: url.string!, with: body).map(to: CountResponse.self) {jsonData in
+      
+      let decoder = JSONDecoder()
+      if let dateFormatter = dateFormatter {
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+      }
+      
+      if let jsonData = jsonData {
+        let decoded = try decoder.decode(CountResponse.self, from: jsonData)
+        
+        return decoded
+      }
+      
+      throw ElasticsearchError(identifier: "count_failed", reason: "Could not execute count", source: .capture(), statusCode: 404)
+    }
+  }
+  
+  
 }
 extension Data {
   var prettyPrintedJSONString: NSString? { /// NSString gives us a nice sanitized debugDescription
