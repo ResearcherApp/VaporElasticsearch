@@ -109,7 +109,8 @@ extension ElasticsearchClient {
   ) -> Future<CountResponse> {
     let body: Data
     do {
-      body = try self.encoder.encode(query)
+      let wrappedQuery: [String: Query] = [ "query" : query ]
+      body = try self.encoder.encode(wrappedQuery)
     } catch {
       return worker.future(error: error)
     }
